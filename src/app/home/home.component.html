@@ -1,0 +1,29 @@
+<div class="section">
+    <div class="container content">
+        <h1 class="h1">Yeet!</h1>
+
+        <div class="field">
+            <span class="select">
+                <select
+                    #effectElement
+                    (input)="changeEffect(effectElement.value)">
+                    <option
+                        *ngFor="let effect of effects"
+                        value="{{effect.value}}"
+                        selected="{{effect.value == effectBehaviorSubject.value}}">{{effect.name}}</option>
+                </select>
+            </span>
+        </div>
+
+        <div class="field">
+            <input
+                #brightnessElement
+                class="slider"
+                type="range"
+                min="0"
+                max="150"
+                value="{{brightnessBehaviourSubject.value}}"
+                (input)="changeBrightness(brightnessElement.value)">
+        </div>
+    </div>
+</div>
