@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
 
-  url: "http://172.16.16.100/led"
+  url: "https://louis-led.duckdns.org/led"
 };
