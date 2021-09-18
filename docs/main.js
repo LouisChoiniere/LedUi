@@ -7,7 +7,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\Users\Argon\Sync\sync\LedUi\src\main.ts */"zUnb");
+module.exports = __webpack_require__(/*! C:\Users\Argon\Sync\sync\coding\LedUi\src\main.ts */"zUnb");
 
 
 /***/ }),
@@ -46,25 +46,28 @@ function HomeComponent_option_8_Template(rf, ctx) { if (rf & 1) {
 } }
 class HomeComponent {
     constructor(ledService) {
-        var _a;
         this.ledService = ledService;
-        this.brightnessBehaviourSubject = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](localStorage.getItem('brightness'));
-        this.effectBehaviorSubject = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"]((_a = localStorage.getItem('effect')) !== null && _a !== void 0 ? _a : 'blank');
         this.effects = [
             { value: 'blank', name: 'Blank' },
             { value: 'static', name: 'Static' },
             { value: 'cyclon rainbow', name: 'Cyclon Bruh' },
             { value: 'rainbow', name: 'Rainbow' },
         ];
+        this.brightnessBehaviourSubject = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](0);
+        this.effectBehaviorSubject = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](this.effects[0].value);
     }
     ngOnInit() {
-        this.brightnessBehaviourSubject
-            .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_0__["debounceTime"])(50), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_0__["switchMap"])(x => this.ledService.setBrightness(x))).subscribe(x => {
-            console.log(x);
-        });
-        this.effectBehaviorSubject
-            .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_0__["switchMap"])(x => this.ledService.setEffect(x))).subscribe(x => {
-            console.log(x);
+        this.ledService.getCurrent().subscribe(x => {
+            this.effectBehaviorSubject.next(x.status);
+            this.brightnessBehaviourSubject.next(x.brightness);
+            this.brightnessBehaviourSubject
+                .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_0__["debounceTime"])(50), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_0__["switchMap"])(x => this.ledService.setBrightness(x))).subscribe(x => {
+                console.log(x);
+            });
+            this.effectBehaviorSubject
+                .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_0__["switchMap"])(x => this.ledService.setEffect(x))).subscribe(x => {
+                console.log(x);
+            });
         });
     }
     changeBrightness(brightness) {
@@ -244,8 +247,10 @@ HomeModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineInjecto
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LedService", function() { return LedService; });
 /* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/common/http */ "tk/3");
-/* harmony import */ var src_environments_environment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! src/environments/environment */ "AytR");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/core */ "fXoL");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs/operators */ "kU1M");
+/* harmony import */ var src_environments_environment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/environments/environment */ "AytR");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/core */ "fXoL");
+
 
 
 
@@ -254,19 +259,29 @@ class LedService {
     constructor(http) {
         this.http = http;
     }
+    getCurrent() {
+        return this.http.get(src_environments_environment__WEBPACK_IMPORTED_MODULE_2__["environment"].url, { responseType: 'text' })
+            .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_1__["map"])(x => {
+            let firstNumber = x.search(/\d/);
+            return {
+                status: x.substr(0, firstNumber),
+                brightness: +x.substr(firstNumber, x.length)
+            };
+        }));
+    }
     setBrightness(brightness) {
         let params = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpParams"]()
             .set('brightness', Math.round(brightness).toString());
-        return this.http.get(src_environments_environment__WEBPACK_IMPORTED_MODULE_1__["environment"].url, { params: params, responseType: 'text' });
+        return this.http.get(src_environments_environment__WEBPACK_IMPORTED_MODULE_2__["environment"].url, { params: params, responseType: 'text' });
     }
     setEffect(effect) {
         let params = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpParams"]()
             .set('effect', effect);
-        return this.http.get(src_environments_environment__WEBPACK_IMPORTED_MODULE_1__["environment"].url, { params: params, responseType: 'text' });
+        return this.http.get(src_environments_environment__WEBPACK_IMPORTED_MODULE_2__["environment"].url, { params: params, responseType: 'text' });
     }
 }
-LedService.ɵfac = function LedService_Factory(t) { return new (t || LedService)(_angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpClient"])); };
-LedService.ɵprov = _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineInjectable"]({ token: LedService, factory: LedService.ɵfac, providedIn: 'root' });
+LedService.ɵfac = function LedService_Factory(t) { return new (t || LedService)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpClient"])); };
+LedService.ɵprov = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineInjectable"]({ token: LedService, factory: LedService.ɵfac, providedIn: 'root' });
 
 
 /***/ }),
